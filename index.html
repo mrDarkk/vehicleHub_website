@@ -1,0 +1,721 @@
+	<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<meta name="description" content="html 5 template">
+	<meta name="author" content="tonytemplates.com">
+	<link rel="icon" href="favicon.ico">
+	<title>Vehicle Hub</title>
+	<!-- Bootstrap core CSS -->
+	<link href="assets/css/plugins/bootstrap.min.css" rel="stylesheet">
+	<link href="assets/css/plugins/jquery.smartmenus.bootstrap.css" rel="stylesheet">
+	<link href="assets/css/plugins/nivo-slider.css" rel="stylesheet">
+	<link href="assets/css/plugins/swiper.min.css" rel="stylesheet">
+	<link href="assets/css/plugins/intlTelInput.min.css" rel="stylesheet" >
+	<link href="assets/css/plugins/remodal.min.css" rel="stylesheet" >
+	<link href="assets/css/plugins/animate.css" rel="stylesheet">
+	<link href="assets/css/main-style.css" rel="stylesheet">
+	
+	<link href="iconfont/style.css" rel="stylesheet">
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+	
+	 <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <!--  <script src="assets/js/main.js"></script> -->
+    <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDP0J81P64u12NYEvovr9VZYOLLLNWXsE8",
+    authDomain: "vehiclehub-9ac1e.firebaseapp.com",
+    databaseURL: "https://vehiclehub-9ac1e.firebaseio.com",
+    projectId: "vehiclehub-9ac1e",
+    storageBucket: "vehiclehub-9ac1e.appspot.com",
+    messagingSenderId: "291036890935"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script type="text/javascript">
+
+    /**
+     * Function called when clicking the Login/Logout button.
+     */
+    // [START buttoncallback]
+
+
+//
+
+    function toggleSignIn() {
+      if (!firebase.auth().currentUser) {
+        // [START createprovider]
+        var provider = new firebase.auth.GoogleAuthProvider();
+        // [END createprovider]
+        // [START addscopes]
+        provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+        // [END addscopes]
+        // [START signin]
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          var token = result.credential.accessToken;
+          // The signed-in user info.
+          var user = result.user;
+          // [START_EXCLUDE]
+          //document.getElementById('quickstart-oauthtoken').textContent = token;
+          // [END_EXCLUDE]
+        }).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // The email of the user's account used.
+          var email = error.email;
+          // The firebase.auth.AuthCredential type that was used.
+          var credential = error.credential;
+          // [START_EXCLUDE]
+          if (errorCode === 'auth/account-exists-with-different-credential') {
+            alert('You have already signed up with a different auth provider for that email.');
+            // If you are using multiple auth providers on your app you should handle linking
+            // the user's accounts here.
+          } else {
+            console.error(error);
+          }
+          // [END_EXCLUDE]
+        });
+        // [END signin]
+      } else {
+        // [START signout]
+        firebase.auth().signOut();
+        // [END signout]
+      }
+      // [START_EXCLUDE]
+      document.getElementById('quickstart-sign-in').disabled = true;
+       document.getElementById('quickstart-sign-in_m').disabled = true;
+      
+      // [END_EXCLUDE]
+    }
+    // [END buttoncallback]
+
+    /**
+     * initApp handles setting up UI event listeners and registering Firebase auth listeners:
+     *  - firebase.auth().onAuthStateChanged: This listener is called when the user is signed in or
+     *    out, and that is where we update the UI.
+     */
+    function initApp() {
+      // Listening for auth state changes.
+      // [START authstatelistener]
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var gemail = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          // [START_EXCLUDE]
+         // document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
+          document.getElementById('quickstart-sign-in').textContent = 'Sign out';
+          //document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+          document.getElementById('quickstart-account-name').textContent = displayName;
+         // document.getElementById('quickstart-account-pic').innerHTML= '<img src=photoURL />'; 
+          document.getElementById("quickstart-account-pic").src=photoURL;
+
+          //moible
+           document.getElementById('quickstart-sign-in_m').textContent = 'Sign out';
+          //document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+          document.getElementById('quickstart-account-name_m').textContent = displayName;
+         // document.getElementById('quickstart-account-pic').innerHTML= '<img src=photoURL />'; 
+          document.getElementById("quickstart-account-pic_m").src=photoURL;
+           document.getElementById('quickstart-profile').disabled = false;
+          
+          
+          // [END_EXCLUDE]
+        } else {
+          // User is signed out.
+          // [START_EXCLUDE]
+         // document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+          	document.getElementById('quickstart-sign-in').textContent = 'Sign in with Google';
+          //document.getElementById('quickstart-account-details').textContent = 'null';
+           document.getElementById('quickstart-account-name').textContent = "Sign In >";
+           document.getElementById("quickstart-account-pic").src="assets/images/img.png";
+
+           //mobile
+           document.getElementById('quickstart-sign-in_m').textContent = 'Sign in with Google';
+          //document.getElementById('quickstart-account-details').textContent = 'null';
+           document.getElementById('quickstart-account-name_m').textContent = "Sign In";
+           document.getElementById("quickstart-account-pic_m").src="assets/images/img.png";   
+            document.getElementById('quickstart-profile').disabled = true;      
+
+          //document.getElementById('quickstart-oauthtoken').textContent = 'null';
+          // [END_EXCLUDE]
+        }
+        // [START_EXCLUDE]
+        document.getElementById('quickstart-sign-in').disabled = false
+         document.getElementById('quickstart-sign-in_m').disabled = false;
+                
+ 
+        // [END_EXCLUDE]
+      });
+
+      // [END authstatelistener]
+
+
+      document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
+      document.getElementById('quickstart-sign-in_m').addEventListener('click', toggleSignIn, false);
+    }
+
+    window.onload = function() {
+      initApp();
+
+    };
+  </script>
+</head>
+
+<body class="page__home">
+<!-- <div class="tools">
+	<a href="#" class="color-blue">Blue</a>
+	<a href="#" class="color-yellow">Yellow</a>
+	<a href="#" class="color-turquoise">Turquoise</a>
+	<a href="#" class="color-orange">Orange</a>
+	<a href="#" class="color-orange-sec">Orange-second</a>
+	<a href="#" class="color-lightblue">Lightblue</a>
+	<a href="#" class="color-pink">Pink</a>
+</div> -->
+<!-- Loader -->
+<div class="plash">
+	<div id="scene">
+		<span></span>
+		<div id="road">
+			<div id="stripes"></div>
+		</div>
+	</div>
+	<div class="loading">Loading<span>...</span></div>
+</div>
+<!-- //Loader --> 
+	<!-- Header -->
+	<header class="site-header">
+			<div class="mobile-top-panel"></div>
+		<div class="mobile-top-panel__fixed">
+			<div class="container">
+				<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+					</div>
+					<div class="menu-navigation navbar-collapse collapse">
+
+					<!-- Left nav -->
+							<ul class="menu-navigation__list nav navbar-nav">
+									<li> <img src="assets/images/img.png" id="quickstart-account-pic_m" height="30" width="30"  class="img-circle" ></li>
+									<li>  <a href="#" id="quickstart-account-name_m" > <span > sign in </span><i class="icon-arrow-down-sign-to-navigate"></i></a>
+
+								<ul class="sub-menu dropdown-menu">
+									<li ><a href="#" id="quickstart-profile_m">View Profile</a></li>	
+									<li><a href="#" id="quickstart-sign-in_m">Sign out</a></li>	
+								</ul>
+							</li>
+							<li></li>
+							<li class="current"><a href="index.html">Home</a></li>
+							<li ><a href="about.html">About us</a></li>
+							<!-- <li><a href="fleet-second.php" data-hover="Fleet">Fleet </a></li> -->
+							<li><a href="rates.html">Rates</a></li>
+							<li><a href="contacts.html">Contacts</a></li>
+							
+						</ul>
+
+					</div><!--/.nav-collapse -->
+				</div>
+				<div class="social-list">
+					<span class="social-list__text">Find us here:</span>
+					<ul class="social-list__icons">
+						<li><a href="https://www.facebook.com"><i class="icon-facebook-logo"></i></a></li>
+						<li><a href="https://twitter.com/vehicle_hub"><i class="icon-twitter-letter-logo"></i></a></li>
+						<li><a href="https://plus.google.com"><i class="icon-google-plus"></i></a></li>
+						<li><a href="https://www.instagram.com/officialvehiclehub/"><i class="icon-instagram"></i></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="header-container_wrap container">
+			<div class="header-container__flex">
+				<div class="logo">
+					<a href="index.html">
+						
+						<img src="assets/images/LOGO.svg" alt="" height="170px" width="150px">
+<!-- 
+						<i class="icon-logo-vh"></i> -->
+						Vehicle <span>Hub </span>
+					</a>
+				</div>
+				<div class="social-list">
+					<span class="social-list__text">Find us here:</span>
+					<ul class="social-list__icons">
+
+						<li><a href="https://www.facebook.com/officialVehicleHub/?modal=admin_todo_tour" target="_blank"><i class="icon-facebook-logo"></i></a></li>
+						<li><a href="https://twitter.com/vehicle_hub" target="_blank"><i class="icon-twitter-letter-logo"></i></a></li>
+						<li><a href="https://plus.google.com"><i class="icon-google-plus"></i></a></li>
+						<li><a href="https://www.instagram.com/officialvehiclehub/" target="_blank"><i class="icon-instagram"></i></a></li>
+
+					</ul>
+				</div>
+				<div class="phone_block">
+					<span><i class="icon-telephone"></i> +91-9424122932</span>
+					<small>Our Reservation Specialists 24/7</small>
+				</div>
+			</div>
+		</div>
+		<div class="header-navigation-wrap stickUp"> 
+			<!-- Navbar fixed top -->
+			<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+					</div>
+					<div class="menu-navigation navbar-collapse collapse">
+
+					<!-- Left nav -->
+						<ul class="menu-navigation__list nav navbar-nav">
+							<li class="current"><a href="index.html" data-hover="Home">Home</a></li>
+							<li><a href="about.html" data-hover="About us">About us</a></li>
+						<!-- 	<li><a href="fleet-second.php" data-hover="Fleet">Fleet </li> -->
+							<li><a href="rates.html" data-hover="Rates">Rates</a></li>
+							<li><a href="tipstesti.html" data-hover="Testimonials">Tips</a></li>
+							<li><a href="contacts.html" data-hover="Contacts">Contacts</a></li>
+								
+						<!--		<li> Firebase sign-in status: <span id="quickstart-sign-in-status">Unknown</span></li>
+								 <pre><code id="quickstart-account-details">null</code></pre>
+             					<pre><code id="quickstart-oauthtoken">null</code></pre>  -->
+             					
+             					<li></li>
+             					
+             					<li>  <a href="#" id="quickstart-account-name" > <span > sign in </span><i class="icon-arrow-down-sign-to-navigate"></i></a>
+								<ul class="sub-menu dropdown-menu">
+								
+									<li ><a href="viewuser/useroverview.html" id="quickstart-profile" >View Profile</a></li>	
+									<li><a href="#" id="quickstart-sign-in" >Sign out</a></li>	
+
+								</ul>
+								<li> <img src="assets/images/img.png" alt="" id="quickstart-account-pic" height="30" width="30"  class="img-circle" ></li>
+								
+							</li>
+						</ul>
+
+					</div><!--/.nav-collapse -->
+				</div><!--/.container -->
+			</div>
+		</div>
+
+	</header>
+	<!-- // Header -->
+	<!-- Content  -->
+	<main id="page-content">
+
+		<!-- Slider -->
+		<div class="slider-wrapper theme-default">
+			<div id="slider" class="nivoSlider"> 
+				<img src="assets/images/slider/s1.jpg" title="#htmlcaption1" data-thumb="assets/images/slider/slide_1.jpg" alt="" /> 
+				<img src="assets/images/slider/s2.jpg" title="#htmlcaption2" data-thumb="assets/images/slider/slide_2.jpg" alt="" /> 
+				<img src="assets/images/slider/s3.jpg" title="#htmlcaption3" data-thumb="assets/images/slider/slide_3.jpg" alt="" />
+			</div>
+			<div id="htmlcaption1" class="nivo-caption">
+				<div class="nivo-caption__inner">
+					<div class="text">
+						<h1 class="showtext showtext__h1">Pick Your Vehicle Now from Our Collection To Find Your Riding Companion</h1>
+						<span class="showtext showtext__link"><a href="#">Start your travel planning here!</a></span>
+					</div>
+				</div>
+			</div>
+			<div id="htmlcaption2" class="nivo-caption">
+				<div class="nivo-caption__inner left-side">
+					<div class="text">
+						<h1 class="showtext showtext__h1">Ride It,<br>Like It,<br>& Love It.</h1>
+						<span class="showtext showtext__link"><a href="#">Vehicle Rental &amp; Chauffeured </a></span>
+					</div>
+				</div>
+			</div>
+			<div id="htmlcaption3" class="nivo-caption">
+				<div class="nivo-caption__inner">
+					<div class="text">
+						<h1 class="showtext showtext__h1">List Your Vehicle Now<br>& Become the<br>  Member of our Family!</h1>
+						<span class="showtext showtext__link"><a href="#">Rent a Vehicle and Save Up to 50%</a></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Slider -->
+
+		<div class="book-form-box">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<form id="book-form" class="book-form" action="#">
+							<span class="book-form__title">
+								Book Now 
+								<small>Best Price Online</small>
+							</span>
+							<div class="book-form__block-select">
+								<div class="inner-block">
+									<div class="book-form__text">Pick up Location</div>
+									<select name="location">
+										<option disabled selected="">Pune</option>
+									</select>
+								</div>
+								<div class="inner-block second-block">
+									
+								</div>
+							</div>
+
+							<div class="book-form__btn">
+									<a class="btn" href="bookclick.php">Book Now
+								<!-- <input type="submit" class="btn" value="BOOK NOW"> -->
+								 </a>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="parallax_box">
+			<figure class="thumbnail move_img wow slideInLeft" data-wow-delay="0.5s"></figure>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-12 col-lg-6 col-lg-push-6"> 
+						<h1>Welcome</h1>
+						<p>Hiring a vehicle is just got easier with the reliable service of vehicle Rental Service! Having covered all 
+						the States in India, we offer the finest choice of vehicles ranging from economy to luxury.</p>
+						
+						<p>	We have tied up with renowned vehicle rental brands so that we can provide our customers 
+						with the most economic vehicle deals along with the world class customer service.   </p>
+						
+						<p>		You can send us your feedback and suggestions after you’ve rented a Vehicle. 
+						We will be happy to read your reviews and advice to improve our service.  </p>
+						<ul class="list__marker">
+							<li>Best price guarantee</li>
+							<li>No cancellation or amendment fees</li>
+							<li>No hidden extras to pay - theft and damage cover included</li>
+						</ul>
+						<a href="#" class="btn">Read more</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<h2 align="center"><span class="text-link">"Our Motto has remained the same : Delighting you 100% "</span></h2>
+		<div class="container">
+			<div class="row info-box">
+				<div class="col-xs-12">
+					<article class="wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.2s">
+						<h1>Start your travel planning here</h1>
+						<span class="text-link">Drive away with more money in your pockets and more time on your itinerary.</span>
+						<a href="bookclick.php" class="btn" >BOOK NOW</a>
+						<a href="contacts.html" class="btn invert">EMAIL US</a>
+					</article>	
+				</div>
+			</div>
+		</div>
+
+		<section class="carousel-models_fullwidth">
+			<div class="carousel-models_fullwidth__inner">
+				<h1>Our Fleet</h1>
+				<span class="text-link">Great Rental Vehicle Selection. Unbeatable Deals.</span>
+				<div class="swiper-container-models swiper-container">
+					<div class="swiper-wrapper">
+						<div class="model-info swiper-slide">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/pulsar200rs.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>Bajaj Pulsar RS200</h3>
+								<p>The Pulsar RS200 used to inevitably divide opinion when it came to its looks. Some were bowled over by all the edges and lines and shapes and surfaces, while others frowned upon them.</p>
+								<span class="cost">From <strong>Rs.60</strong> per Hour</span>
+								<span class="btn btn-model" data-remodal-target="modal">book now</span>
+							</div>
+						</div>
+						<div class="model-info swiper-slide">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/pulsar200ns.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>Bajaj Pulsar 200NS</h3>
+								<p>The Bajaj Pulsar 200NS/NS200 is a sports bike made by Bajaj Auto. The Pulsar 200NS/NS200 has a single-cylinder, four-stroke, triple spark-ignition & liquid-cooled engine.</p>
+								<span class="cost">From <strong>Rs.60</strong> per Hour</span>
+								<span class="btn btn-model" data-remodal-target="modal">book now</span>
+							</div>
+						</div>
+						<div class="model-info swiper-slide">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/avengers.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>Bajaj Avenger 220</h3>
+								<p>Bajaj launched a 220 cc version of Bajaj Avenger. It comes with variant colors and with Oil cooled radiator for its engine. Avenger 220 gives an average of 35–40 km/L. Top Speed 135 km/h.</p>
+								<span class="cost">From <strong>Rs.70</strong> per Hour</span>
+								<span class="btn btn-model" data-remodal-target="modal">book now</span>
+							</div>
+						</div>
+						<div class="model-info swiper-slide">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/jupiter.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>TVS Jupiter</h3>
+								<p>TVS Jupiter is a variomatic scooter.It is powered by a single cylinder, four stroke and 110 cc. The scooter has an 'Econometer' and has a fuel efficiency of 62 kmpl per the manufacturer.</p>
+								<span class="cost">From <strong>Rs.40</strong> per Hour</span>
+								<span class="btn btn-model" data-remodal-target="modal">book now</span>
+							</div>
+						</div>
+						<div class="model-info swiper-slide swiper-slide-active">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/activa.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>Honda Activa</h3>
+								<p>Honda Activa is a 109/125 cc, 7 bhp (5.2 kW) scooter. The vehicle has the option of kick- and self-start, includes the puncture-resistant "tuff-up" tyre and tube combination.</p>
+								<span class="cost">From <strong>Rs.40</strong> per Hour</span>
+								<span class="btn btn-model" data-remodal-target="modal">book now</span>
+							</div>
+							
+						</div>
+						<div class="model-info swiper-slide">
+							<figure class="thumbnail"><a href="details.html"><img src="assets/images/access.png" alt=""></a></figure>
+							<div class="model-info__content">
+								<h3>Suzuki Access</h3>
+								<p>Suzuki Access combines the best of both worlds - power & mileage - with revolutionary SEP technology. A complete redesign from the ground up emphasizes that this scooter welcomes any road.</p>
+								<span class="cost">From <strong>Rs.40</strong> per Hour</span>
+								<a href="details.html"  class="btn invert">book now</a>
+							</div>		
+						</div>
+					</div><!-- // swiper-container-Vehicle  -->
+				</div>
+				<div class="swiper-pagination-models"></div> 
+				<div class="navigation_block">
+					<span class="swiper-button-next"><i class="icon-left-arrow2"></i></span>
+					<span class="swiper-button-prev"><i class="icon-left-arrow"></i></span>
+				</div>
+			</div>
+		</section> <!-- // Full width carousel  -->
+
+
+		<section class="testimonials-carousel_box">
+			<div class="container">
+
+				<h1>Clients Say</h1>
+				<span class="text-link">What our clients say about us</span>
+				<div class="swiper-container-blockquote swiper-container">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide">
+							<article class="block_tesimonial">
+								<blockquote>
+									<div class="inner_blockquote">
+										<div class="wrapper">
+											<p>I was very pleased once again. Hiring online was easy, collection was straight forward, and returning the Vehicle was quick. A very good experience! Thank you.</p>
+											<span class="author_info">
+												<span class="name"><a href="#">Rishabh Khandelwal</a></span>
+												<span class="position">Regular Customer</span>
+											</span>
+										</div>
+									</div>
+								</blockquote>
+							</article>
+						</div>
+						<div class="swiper-slide">
+							<article class="block_tesimonial">
+								<blockquote>
+									<div class="inner_blockquote">
+										<div class="wrapper">
+											<p>This is the second time this year that I have rented a Rental Vehicle direct vehicle and the Vehicles were both virtually brand new. Awesome Vehicles and very kind, helpful staff. Thank you!</p>
+											<span class="author_info">
+												<span class="name"><a href="#">Tanmay Ghosh</a></span>
+												<span class="position">Regular Customer</span>
+											</span>
+										</div>
+									</div>
+								</blockquote>
+								
+							</article>
+						</div>
+						<div class="swiper-slide">
+							<article class="block_tesimonial">
+								<blockquote>
+									<div class="inner_blockquote">
+										<div class="wrapper">
+											<p>Great Service, Absolutely Terrific staff, extremely professional!!! This was my first ever Vehicle Renting experience, Awesome!!</p>
+											<span class="author_info">
+												<span class="name"><a href="#">Deepansh Dubey</a></span>
+												<span class="position">Regular Customer</span>
+											</span>
+										</div>
+									</div>
+								</blockquote>
+							</article>
+						</div>
+						<div class="swiper-slide">
+							<article class="block_tesimonial">
+								<blockquote>
+									<div class="inner_blockquote">
+										<div class="wrapper">
+											<p>Im really impressed with your staff at all moosa branch, patricia. She has sevice minded, be attentive, proactive. I think you have a very value staff with you.</p>
+											<span class="author_info">
+												<span class="name"><a href="#">Vivek Modi</a></span>
+												<span class="position">Regular Customer</span>
+											</span>
+										</div>
+									</div>
+								</blockquote>
+							</article>
+						</div>
+					</div>
+				</div>
+				<div class="swiper-pagination swiper-pagination-blockquote"></div>
+				<span class="swiper-button-next1"><i class="icon-left-arrow2"></i></span>
+				<span class="swiper-button-prev1"><i class="icon-left-arrow"></i></span>
+			</div>
+		</section>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="phone-box wow zoomIn">  
+						<h1>Join Us and Save on Vehicle Rentals!</h1> 
+						<span class="text-link">Great offers for cheap Vehicle rental, daily, weekly long term rentals</span>
+						<h3 class="phone-box__number">Call Now: <span><i class="icon-telephone"></i> +91-9424122932</span></h3>
+					</div>
+				</div>
+			</div>
+		</div>
+		<section class="iphone-parallax_box">
+			<div class="container">
+				<div class="row">
+					<!-- <div class="col-sm-12">
+						<div class="iphone-android_info-box">
+							<h1><span>Free iPhone &amp;</span> <span>Android App</span></h1>
+							<p><span>Renal Vehicle App is a Vehicle rental marketplace where travelers can rent any Vehicle they want,</span> <span>wherever they want it, from a community of local Vehicle owners throughout the US and Canada.</span></p>
+							<span><a target="_blank" href="https://itunes.apple.com"><img src="assets/images/app_store.jpg" alt=""></a>
+							<a target="_blank" href="https://play.google.com/store"><img src="assets/images/google_play.jpg" alt=""></a></span>
+							<div class="secondeffect">
+								<div class="first-text-block">
+									<span>Our Fleet <em>Great Rental Vehicle Selection.</em></span>
+								</div>
+								<div class="second-text-block">
+									<i class="icon-logo"></i>
+									<span class="title_block"><span>RentalVehicle</span>
+									<em><i class="icon-telephone"></i> +91-9424122932</em>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div> -->
+			</div>
+		</section>
+	</main>
+	<!-- // Content  -->
+	<!-- Footer -->
+	<footer class="site-footer">
+		<section class="site-footer__top-panel">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-sm-4">
+						<div class="top-panel__info">
+							<i class="icon-Cancellation"></i>
+							<strong>Free cancellation</strong> 
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4">
+						<div class="top-panel__info">
+							<i class="icon-commerce"></i>
+							<strong>No credit Vehicled fees</strong>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4">
+						<div class="top-panel__info">
+							<i class="icon-phone"></i>
+							<strong>24/7 Call Center</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section  class="box-elements">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-12 col-lg-3">
+						<!-- <img src="assets/images/LOGO.svg" alt="" height="500px" width="500px"> -->
+						<!-- <figure class="footer_logo"><img src="assets/images/LOGO.png" alt="" height="170px" width="150px"></figure> -->
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+						<h5>Company</h5>
+						<ul class="footer-list">
+							<li><a href="about.html">About us</a></li>
+							<li><a href="#">Emergency Contacts</a></li>
+							<li><a href="contacts.html">Contact</a></li>
+						</ul>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+						<h5>Customer Services</h5>
+						<ul class="footer-list">
+							<li><a href="#">FAQs</a></li>
+							<li><a href="#">Help renting a Vehicle</a></li>
+							<li><a href="#">Terms and Conditions</a></li>
+						</ul>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+						<div class="contact-info">
+							<span class="phone_number"><i class="icon-telephone"></i> +91-9424122932	</span>
+							
+							<span class="location_info">
+							<i class="icon-placeholder-for-map"></i>
+							<em>Tri-Murti  Chowk </em> 
+							<em>Bharti Vidyapeeth , Katraj,</em> 
+							<em>PUNE, 411043.</em> </span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="site-footer__bottom-panel">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-md-6">
+						<div class="copyright">&copy; 2018 | <a href="#">Privacy Policy</a> | <a href="#">Rental policy</a></div>
+					</div>
+					<div class="col-xs-12 col-md-6"> 
+						<div class="social-list">
+							<ul class="social-list__icons">
+								<li><a href="www.facebook.com"><i class="icon-facebook-logo"></i></a></li>
+								<li><a href="www.twitter.com"><i class="icon-twitter-letter-logo"></i></a></li>
+								<li><a href="https://plus.google.com"><i class="icon-google-plus"></i></a></li>
+								<li><a href="https://www.linkedin.com"><i class="icon-instagram"></i></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<a href="#" class="scrollup"><i class="icon-arrow-down-sign-to-navigate"></i></a>
+
+	</footer>
+<!-- <div class="remodal" data-remodal-id="modal"> -->
+	
+<!-- // order-details-form  -->
+
+	<!-- //Footer -->
+	<!-- Google map -->
+	
+	<script src="assets/js/jquery.1.12.4.min.js"></script>
+	<script src="assets/js/plugins/bootstrap.min.js"></script>
+	<script src="assets/js/plugins/wow.min.js"></script>
+	<script src="assets/js/plugins/jquery.smartmenus.min.js"></script>
+	<script src="assets/js/plugins/jquery.smartmenus.bootstrap.js"></script>
+	<script src="assets/js/plugins/jquery.nivo.slider.js"></script>
+	<script src="assets/js/plugins/swiper.min.js"></script>
+	<script src="assets/js/plugins/intlTelInput.min.js"></script>
+	<script src="assets/js/plugins/remodal.js"></script>
+	<script src="assets/js/plugins/stickup.min.js"></script>
+	<script src="assets/js/plugins/tool.js"></script>
+	<script src="assets/js/custom.js"></script>
+</body>
+
+</html>
